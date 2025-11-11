@@ -1,0 +1,49 @@
+# Step 1: Import Libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Step 2: Load Data
+# You can use a simple spam dataset (e.g., from Kaggle)
+# For this demo, let's create a small example dataset manually
+
+data = {
+    'text': [
+        'Congratulations, you have won a free ticket!',
+        'Hey, are we still meeting today?',
+        'Exclusive offer just for you, click here to claim your prize.',
+        'Reminder: your appointment is at 3 PM.',
+        'Win money now!!! Claim your reward instantly.',
+        'Please find the project report attached.'
+    ],
+    'label': [1, 0, 1, 0, 1, 0]  # 1 = spam, 0 = not spam
+}
+
+df = pd.DataFrame(data)
+
+# Step 3: Split Data
+X_train, X_test, y_train, y_test = train_test_split(df['text'], df['label'], test_size=0.3, random_state=42)
+
+# Step 4: Convert Text to Numbers (TF-IDF)
+vectorizer = TfidfVectorizer(stop_words='english')
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
+
+# Step 5: Train the Model
+model = LogisticRegression()
+model.fit(X_train_vec, y_train)
+
+# Step 6: Predict
+y_pred = model.predict(X_test_vec)
+
+# Step 7: Evaluate
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+# Step 8: Test with New Example
+sample_email = ["You have won a lottery! Click to claim now."]
+sample_vec = vectorizer.transform(sample_email)
+print("\nPrediction for sample email:", model.predict(sample_vec))
